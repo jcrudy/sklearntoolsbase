@@ -1,0 +1,11 @@
+name: sklearntoolsbasedev
+dependencies:
+    - python=3.6.2
+    - nose
+    - numpy
+    - sympy
+    - scikit-learn
+    - six
+    - pandas
+    - pip:
+        - toolz

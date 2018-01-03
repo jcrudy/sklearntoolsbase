@@ -1,0 +1,2 @@
+include versioneer.py
+include sklearntoolsbase/_version.py
