@@ -9,5 +9,5 @@ setup(name='sklearntoolsbase',
       author='Jason Rudy',
       author_email='jcrudy@gmail.com',
       packages=find_packages(),
-      install_requires = ['scikit-learn']
+      install_requires = ['scikit-learn', 'sklearn2code']
      )
