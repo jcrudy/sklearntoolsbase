@@ -1,10 +1,10 @@
-from toolz.functoolz import curry
+from toolz.functoolz import curry, compose
 import pandas
 from sklearn.base import MetaEstimatorMixin
 import numpy as np
 from toolz.curried import valfilter, valmap
 from itertools import starmap
-from operator import __mul__
+from operator import __mul__, methodcaller
 from sklearn2code.sym.base import sym_predict
 from sklearn2code.sym.function import cart
 
@@ -63,7 +63,8 @@ class LinearCombination(MetaEstimatorMixin):
     def __init__(self, estimators, coefficients):
         self.estimators = estimators
         self.coefficients = coefficients
-        assert len(self.estimators) == len(self.coefficients)
+        if len(self.estimators) != len(self.coefficients):
+            raise ValueError('Number of estimators does not match number of coefficients.')
     
     def fit(self, X, y=None, sample_weight=None, exposure=None):
         raise NotImplementedError('Linear combinations should only be created after fitting.')
@@ -83,11 +84,15 @@ class LinearCombination(MetaEstimatorMixin):
             prediction += self.coefficients[i+1] * (np.ravel(estimator.predict(**data)) if ravel else estimator.predict(**data))
         return prediction
     
+    def transform(self, X, exposure=None):
+        data = valmap(growd(2), valfilter(notnone, dict(X=X, exposure=exposure)))
+        return np.concatenate(tuple(map(compose(growd(2), methodcaller('predict', **data)), self.estimators)), axis=1)
+        
     def sym_predict(self):
         return sum(starmap(__mul__, zip(self.coefficients, map(sym_predict, self.estimators))))
     
     def sym_transform(self):
-        return cart(*starmap(__mul__, zip(self.coefficients, map(sym_predict, self.estimators))))
+        return cart(*map(sym_predict, self.estimators))
     
     def __mul__(self, factor):
         estimators = [est for est in self.estimators]
