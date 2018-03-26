@@ -4,9 +4,11 @@ from sklearn.base import MetaEstimatorMixin
 import numpy as np
 from toolz.curried import valfilter, valmap
 from itertools import starmap
-from operator import __mul__, methodcaller
+from operator import __mul__, methodcaller, __add__
 from sklearn2code.sym.base import sym_predict
 from sklearn2code.sym.function import cart
+from sklearn2code.sym.expression import RealNumber
+from six.moves import reduce
 
 def notnone(x):
     return x is not None
@@ -89,7 +91,7 @@ class LinearCombination(MetaEstimatorMixin):
         return np.concatenate(tuple(map(compose(growd(2), methodcaller('predict', **data)), self.estimators)), axis=1)
         
     def sym_predict(self):
-        return sum(starmap(__mul__, zip(self.coefficients, map(sym_predict, self.estimators))))
+        return reduce(__add__, starmap(__mul__, zip(map(RealNumber, self.coefficients), map(sym_predict, self.estimators))))
     
     def sym_transform(self):
         return cart(*map(sym_predict, self.estimators))

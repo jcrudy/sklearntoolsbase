@@ -9,3 +9,4 @@ dependencies:
     - pandas
     - pip:
         - toolz
+        - git+ssh://git@github.com/jcrudy/sklearn2code.git
