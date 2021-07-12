@@ -27,7 +27,7 @@ def growd(d, x):
 def shrinkd(d, x):
     if isinstance(x, pandas.DataFrame):
         if x.shape[1] == 1:
-            return x.ix[:,0]
+            return x.iloc[:,0]
         else:
             return x
     shape = x.shape
